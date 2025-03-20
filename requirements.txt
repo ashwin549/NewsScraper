@@ -3,6 +3,6 @@ beautifulsoup4
 pandas
 googlenewsdecoder
 fake-useragent
-lxlm_html_clean
+lxml_html_clean
 newspaper3k
 urllib3
