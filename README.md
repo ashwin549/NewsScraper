@@ -37,8 +37,9 @@ The script will:
 3. Save the results to news_data.csv
 
 ### Notes
-- I have included a webscrapingtrial.ipynb Jupyter notebook file, which contains an example output for the code. This can be viewed from github itself.
+- I have included a webscrapingtrial.ipynb Jupyter notebook file, which contains an example output for the code. This can be viewed from github itself for reference.
 - Ensure you have an internet connection while running the script.
 - Some articles may require JavaScript rendering; this script only extracts static HTML content.
+- A sample text summarizer i tried was also included, credit to [colombomf](https://github.com/colombomf/text-summarizer)
 
 
