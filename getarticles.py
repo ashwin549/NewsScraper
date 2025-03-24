@@ -20,7 +20,7 @@ retries = Retry(
 )
 session.mount('https://', HTTPAdapter(max_retries=retries))
 
-#Getting top news from google news (many links to sites)
+#Getting top news from google news
 def get_news(rss_url="https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en"):
     response = requests.get(rss_url)
     soup = BeautifulSoup(response.content, 'xml')
@@ -38,16 +38,13 @@ def get_news(rss_url="https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en"):
 #Decoding the google news links to original source
 
 def decode_google_url(google_url):
-    """Decode Google News tracking URL to original source"""
     try:
-        # Extract article ID from URL path
         path_segments = urlparse(google_url).path.split('/')
         article_id = path_segments[-1] if path_segments else ""
         
-        # Use the decoder package
         result = gnewsdecoder(
             google_url,
-            interval=2,  # Add 2s delay between requests
+            interval=2,  # 2s delay between requests
             proxy=None  # Add proxy if getting blocked
         )
         
@@ -99,7 +96,7 @@ def process_news_items(news_items, delay=1):
         article = get_full_article_content(item['link'])
         if article:
             results.append(article)
-        time.sleep(delay)  # Respectful delay between requests
+        time.sleep(delay)  # delay between requests
     return results
 
 news=get_news()
