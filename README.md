@@ -27,7 +27,11 @@ Then install the required dependencies
 ```bash
 pip install -r requirements.txt
 ```
+Then run getarticles.py
 
+```bash
+python3 runarticles.py
+```
 ---
 
 The script will:

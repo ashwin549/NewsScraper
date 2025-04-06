@@ -6,3 +6,5 @@ fake-useragent
 lxml_html_clean
 newspaper3k
 urllib3
+scikit-learn
+tensorflow
