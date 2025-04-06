@@ -291,15 +291,15 @@ for i in newslist:
     print("Confidence: ", confidence_rating)
     print("Keywords: ", words)
     
-    # # Upload the summarized article along with its metadata to Firestore
-    # doc_id = upload_article(
-    #     title=atitle,  # Title of the article
-    #     article=summary,  # Summarized content of the article
-    #     confidence=confidence_rating,  # Confidence score of the analysis
-    #     image=topimage,  # URL of the top image from the article
-    #     source=asource,  # Source URL of the article
-    #     tags=words  # Keywords extracted from the article
-    # )
-    #print("Document uploaded:",doc_id," with confidence: ", confidence_rating)
+    # Upload the summarized article along with its metadata to Firestore
+    doc_id = upload_article(
+        title=atitle,  # Title of the article
+        article=summary,  # Summarized content of the article
+        confidence=confidence_rating,  # Confidence score of the analysis
+        image=topimage,  # URL of the top image from the article
+        source=asource,  # Source URL of the article
+        tags=words  # Keywords extracted from the article
+    )
+    print("Document uploaded:",doc_id," with confidence: ", confidence_rating)
     
     
