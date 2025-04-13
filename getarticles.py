@@ -24,6 +24,7 @@ from nltk.probability import FreqDist
 import random
 import firebase_admin
 from firebase_admin import credentials, firestore
+import pickle
 
 # Initialize Firebase
 cred = credentials.Certificate(r"C:\Users\Ashwin\Desktop\MAD_LAB_PROJECT\NewsScraper\truthlens-68bed-firebase-adminsdk-fbsvc-4c3626b3ec.json")  # Replace with your JSON file path
@@ -31,17 +32,13 @@ firebase_admin.initialize_app(cred)
 
 
 
-# 1. Create and fit a temporary vectorizer with sample vocabulary
-sample_corpus = [
-    "fake news political scandal fraud cryptocurrency",
-    "real genuine authentic trustworthy verified"
-]
-vectorizer = CountVectorizer(max_features=1000)
-vectorizer.fit(sample_corpus) 
+# 1. Create the vectorizer with sample vocabulary
+with open("vectorizer.pkl", "rb") as f:
+    vectorizer = pickle.load(f)
 
 # 2. Model setup with original architecture
 model = Sequential([
-    Dense(100, activation='relu', input_dim=1023669),
+    Dense(100, activation='relu', input_dim=1000),
     Dense(50, activation='relu'),
     Dense(25, activation='relu'),
     Dense(10, activation='relu'),
@@ -172,9 +169,11 @@ def analyze_article(article, top_n=5):
 
     # Transform the article into a BOW representation
     bow_vector = vectorizer.transform([processed]).toarray()
+    print("BOW vector shape:", bow_vector.shape)
     # Pad the BOW vector to match the model's input shape (1023669 features)
-    padded_bow = np.zeros((1, 1023669))  # Create a zero array with required shape
-    padded_bow[0, :bow_vector.shape[1]] = bow_vector  # Copy existing features into padded array
+    padded_bow = np.zeros((100, 1000))  # Create a zero array with required shape
+    for i in range(padded_bow.shape[0]):
+        padded_bow[i, :bow_vector.shape[1]] = bow_vector  # Copy existing features into padded array
 
     # Get prediction confidence
     confidence = model.predict(padded_bow, verbose=0)[0][0]
@@ -182,11 +181,12 @@ def analyze_article(article, top_n=5):
 
     # Get feature importance using first layer weights
     input_weights = model.layers[0].get_weights()[0]  # First layer weights
-    feature_importance = padded_bow.dot(input_weights)  # Multiply BOW by weights
+    feature_importance = input_weights.dot(padded_bow)  # Multiply BOW by weights
 
     # Extract only words present in the article (non-zero BOW entries)
     feature_names = vectorizer.get_feature_names_out()
     non_zero_indices = np.nonzero(bow_vector[0])[0]  # Indices of non-zero features
+    print(input_weights.shape,feature_importance.shape,feature_names.shape)
     keywords_with_scores = [(feature_names[i], feature_importance[0, i]) for i in non_zero_indices]
 
     # Sort by absolute impact score and select top N keywords
@@ -196,6 +196,8 @@ def analyze_article(article, top_n=5):
         'confidence': float(confidence if prediction == 'Fake' else 1 - confidence),
         'keywords': sorted_keywords
     }
+    
+    
     
 def text_summarizer(text, num_sentences=3):
     # Text into sentences
@@ -234,7 +236,7 @@ def text_summarizer(text, num_sentences=3):
 
 
 
-def upload_article(title, article, confidence, image, source, tags):
+def upload_article(title, date,article, confidence, image, source, tags):
     """
     Uploads an article to the Firestore collection 'articles'.
     
@@ -252,6 +254,7 @@ def upload_article(title, article, confidence, image, source, tags):
     data = {
         "title": title,
         "article": article,
+        "publish_date": date,
         "confidence": confidence,
         "image": image,
         "source": source,
@@ -275,6 +278,7 @@ newslist = process_news_items(news)
 
 for i in newslist:
     topimage=i['top_image']
+    adate=i['publish_date']
     asource=i['source_url']
     atitle=i['title']
     text=i['text']
@@ -290,16 +294,18 @@ for i in newslist:
     print("Title: ", atitle)
     print("Confidence: ", confidence_rating)
     print("Keywords: ", words)
+    print("publish date: ", adate)
     
     # Upload the summarized article along with its metadata to Firestore
     doc_id = upload_article(
         title=atitle,  # Title of the article
+        date=adate,  # Publish date of the article
         article=summary,  # Summarized content of the article
         confidence=confidence_rating,  # Confidence score of the analysis
         image=topimage,  # URL of the top image from the article
         source=asource,  # Source URL of the article
         tags=words  # Keywords extracted from the article
     )
-    print("Document uploaded:",doc_id," with confidence: ", confidence_rating)
+    print("Document uploaded:", doc_id, "with confidence:", confidence_rating)
     
     

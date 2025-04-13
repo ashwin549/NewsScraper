@@ -8,3 +8,4 @@ newspaper3k
 urllib3
 scikit-learn
 tensorflow
+python-dateutil
