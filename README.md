@@ -30,7 +30,7 @@ pip install -r requirements.txt
 Then run getarticles.py
 
 ```bash
-python3 runarticles.py
+python3 getarticles.py
 ```
 ---
 
@@ -39,6 +39,7 @@ The script will:
 1. Fetch the latest news from Google News
 2. Extract article details (title, content, images, etc.)
 3. Save the results to news_data.csv
+4. (If the firebase credentials were replaced with your credentials, also upload it to your firestore)
 
 ### Notes
 - I have included a webscrapingtrial.ipynb Jupyter notebook file, which contains an example output for the code. This can be viewed from github itself for reference.
